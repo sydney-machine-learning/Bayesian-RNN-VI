@@ -8,7 +8,7 @@ import math
 PI = 0.5
 SIGMA1 = torch.FloatTensor([math.exp(-0)])
 SIGMA2 = torch.FloatTensor([math.exp(-6)])
-SAMPLES = 10
+SAMPLES = 100
 
 class Bayes_Linear(nn.Module):
     def __init__(self, in_features, out_features):
@@ -98,19 +98,12 @@ class BayesianRNN(nn.Module):
         for i in range(samples):
             Outputs[i] = self(input, sampling = True)
             log_priors[i] = self.log_prior()
-            log_variational_posterior[i] = self.log_variational_posterior()
-            
+            log_variational_posterior[i] = self.log_variational_posterior()   
         log_prior = log_priors.mean()
         log_variational_posterior = log_variational_posterior.mean()
-        Loss = nn.MSELoss()
+        Loss = nn.MSELoss() 
         negative_log_likelihood = Loss(Outputs.mean(0), target)
+        MSE_loss = negative_log_likelihood       
+        loss = (log_variational_posterior - log_prior)/117 + negative_log_likelihood
         
-        loss = (log_variational_posterior - log_prior)/sequence_size - negative_log_likelihood
-        
-        return loss        
-        
-        
-        
-    
-            
-        
+        return loss, MSE_loss, Outputs   
