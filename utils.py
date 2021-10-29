@@ -7,10 +7,10 @@ class Gaussian_weights(object):
         self.mu = mu
         self.rho = rho
         self.sigma = torch.log1p(torch.exp(self.rho))
-        self.epsilon = torch.distributions.Normal(0,1).sample(self.rho.size())
         
     def sample(self):
-        sample = self.mu + self.sigma*self.epsilon 
+        epsilon = torch.distributions.Normal(0,1).sample(self.rho.size())
+        sample = self.mu + self.sigma*epsilon 
 
         return sample 
     
