@@ -5,6 +5,7 @@ from utils import Gaussian_weights, ScaledMixedGaussian
 import math
 
 
+
 PI = 0.5
 SIGMA1 = torch.FloatTensor([math.exp(-0)])
 SIGMA2 = torch.FloatTensor([math.exp(-6)])
@@ -80,7 +81,7 @@ class BayesianRNN(nn.Module):
             output = self.i_to_o(combined, sampling)
            
             H_prev=h_t
-       
+        
         return output
     
     def log_prior(self):
@@ -89,7 +90,7 @@ class BayesianRNN(nn.Module):
     def log_variational_posterior(self):
         return (self.i_to_h.log_variational_posterior + self.i_to_o.log_variational_posterior)
     
-    def sampling_loss(self, input, target, samples = SAMPLES):
+    def sampling_loss(self, input, target,NUM_BATCHES, samples = SAMPLES):
         batch_size, sequence_size = list(input.size())[0],list(input.size())[1]
         Outputs = torch.zeros(samples, batch_size, self.output_dim)
         log_priors = torch.zeros(samples)
@@ -98,12 +99,33 @@ class BayesianRNN(nn.Module):
         for i in range(samples):
             Outputs[i] = self(input, sampling = True)
             log_priors[i] = self.log_prior()
-            log_variational_posterior[i] = self.log_variational_posterior()   
+            log_variational_posterior[i] = self.log_variational_posterior()  
         log_prior = log_priors.mean()
         log_variational_posterior = log_variational_posterior.mean()
-        Loss = nn.MSELoss() 
+        Loss = nn.MSELoss()
+        var = torch.ones(target.size()[0], 1, requires_grad= True)
         negative_log_likelihood = Loss(Outputs.mean(0), target)
-        MSE_loss = negative_log_likelihood       
-        loss = (log_variational_posterior - log_prior)/117 + negative_log_likelihood
+        MSE_loss =negative_log_likelihood
+        '''
+        for i in range(samples):
+            MSE_loss.append(Loss(Outputs[i], target))   
+        ''' 
+        loss = (log_variational_posterior - log_prior)/NUM_BATCHES + negative_log_likelihood
         
-        return loss, MSE_loss, Outputs   
+        return loss, MSE_loss, Outputs     
+    
+    def testing(self, input, target, num_batches, samples = SAMPLES):
+        batch_size, sequence_size = list(input.size())[0],list(input.size())[1]
+        Outputs = torch.zeros(samples, batch_size, self.output_dim)
+        MSE_loss = []
+        Loss = nn.MSELoss()
+        output = self(input, sampling = True)
+        negative_log_likelihood = Loss(Outputs.mean(0), target)
+        MSE_loss =negative_log_likelihood
+        return MSE_loss
+        
+        
+        
+    
+            
+        
