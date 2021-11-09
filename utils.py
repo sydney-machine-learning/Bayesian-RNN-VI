@@ -31,4 +31,13 @@ class ScaledMixedGaussian(object):
         pd2 = torch.exp(self.Gaussian2.log_prob(x))
         return (torch.log(self.pi*pd1 + (1-self.pi)*pd2)).sum()
         
-        
+
+
+class Gaussian(object):
+    def __init__(self, sigma):
+        super().__init__()
+        self.sigma = sigma
+        self.gaussian = torch.distributions.Normal(0, self.sigma)
+    
+    def log_prob(self, x):
+        return self.gaussian.log_prob(x).sum()

@@ -24,7 +24,7 @@ for i in range(1,epochs+1):
     MSE_loss = 0
 
     model.train()
-    for seq,labels in trainloader:
+    for seq, labels in trainloader:
         model.zero_grad()
         loss,MSE_loss, Outputs = model.sampling_loss(seq, labels, NUM_BATCHES)
         loss.backward(retain_graph = True)
@@ -60,11 +60,7 @@ print(f'train_stddev ----> {train_stddev}')
 print(f'test average ----> {test_avg}')
 print(f'test_stddev ----> {test_stddev}')
 
-    
-
-
-
-saveplot = r'D:\python\BBB_RNN\epochs_10_MSEloss.png'
+saveplot = r'MSE.png'
 """
 plt.plot(losses, label = 'Training KL Divergence loss')
 plt.legend()
