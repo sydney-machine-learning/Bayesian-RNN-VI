@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset
+from sklearn.preprocessing import StandardScaler
 
 train_data_path = r'cyclone/data/southindianocean.csv'
 
@@ -10,6 +11,11 @@ OUT_STEPS = 5
 
 # Load data
 df = pd.read_csv(train_data_path, index_col=False).drop(columns=['Unnamed: 0'])
+
+# Scaling the data
+scaler = StandardScaler()
+df.loc[:, ['longitude', 'latitude']] = scaler.fit_transform(df.loc[:, ['longitude', 'latitude']])
+
 
 class CycloneDataset(Dataset):
     def __init__(self, df, in_steps=IN_STEPS, out_steps=OUT_STEPS):
