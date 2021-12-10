@@ -1,27 +1,47 @@
-import csv
 import torch
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
+import torch.nn as nn
 import numpy as np
+import matplotlib.pyplot as plt
+from copy import deepcopy
+import torch.nn.functional as F
+from sklearn.model_selection import train_test_split
+import time
+import pickle
 
-data_path = r'D:\python\BBB_RNN\train1.csv'
-OUT_STEP = 5
+import sys
+import os
+module_path = os.path.abspath(os.path.join('..'))
+if module_path not in sys.path:
+    sys.path.append(module_path)
+    
+from data_processing import data_processing
+import scipy.io as sio
+import numpy as np
+from sklearn.metrics import mean_squared_error
 
-with open(data_path, mode = 'r') as file:
-    csvfile = csv.reader(file)
-    train_X = []
-    train_Y = []
-    for i,lines in enumerate(csvfile):
-        if i>1:
-           x_temp = []
-           for j in range(1,6):
-               x_temp.append(float(lines[j]))
-           y_temp=[]
-           ind_end = 6+OUT_STEP
-           for j in range(6,ind_end):
-               y_temp.append(float(lines[j]))
-           train_X.append(x_temp)
-           train_Y.append(y_temp)
+from torch.utils.data import DataLoader, Dataset
+
+def extract_data(data):
+    data = [data_processing(data[i], 4) for i in range(len(data))]
+    X, Y = list(zip(*data))
+    X = torch.tensor(np.concatenate(X, axis=0)).type(torch.float)
+    Y = torch.tensor(np.concatenate(Y, axis=0)).type(torch.float)
+    return X, Y
+
+train_data = os.path.join(os.getcwd(), 'data', 'cytrack_train.mat')
+train = sio.loadmat(train_data)
+train = train['cyclones_train']
+train_final = train[0]
+
+test_data = os.path.join(os.getcwd(), 'data', 'cytrack_test.mat')
+test = sio.loadmat(test_data)
+test = test['cyclones_test']
+test_final = test[0]
+
+X_train, Y_train = extract_data(train_final)
+X_test, Y_test = extract_data(test_final)
+
+
 
 class data_set(Dataset):                                         #Custom dataset class for dataloader
     def __init__(self,trainx,labelx):
@@ -35,11 +55,9 @@ class data_set(Dataset):                                         #Custom dataset
   
     def __getitem__(self, index):
         return self.data[index]
-train_X = torch.Tensor(train_X) 
-train_Y = torch.Tensor(train_Y)
-trainset = data_set(train_X,train_Y)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=16, shuffle=False) 
 
+trainset = data_set(X_train,Y_train)
+testset = data_set(X_test, Y_test)
 
-    
-                 
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=1024, shuffle=False) 
+testloader = torch.utils.data.DataLoader(testset, batch_size=1024, shuffle=False) 

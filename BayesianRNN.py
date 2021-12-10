@@ -1,14 +1,14 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils import Gaussian_weights, ScaledMixedGaussian
+from utils.utils import Gaussian_weights, ScaledMixedGaussian
 import math
 
 
 
 PI = 0.5
-SIGMA1 = torch.FloatTensor([math.exp(-0)])
-SIGMA2 = torch.FloatTensor([math.exp(-6)])
+SIGMA1 = 6
+SIGMA2 = 6
 SAMPLES = 100
 
 class Bayes_Linear(nn.Module):
@@ -49,7 +49,6 @@ class Bayes_Linear(nn.Module):
             self.log_variational_posterior = self.weight.log_prob(weight) + self.bias.log_prob(bias)
         else:
             self.log_prior,self.log_variational_posterior = 0,0
-        x = x.unsqueeze(2)
         Y = torch.matmul(weight, x) + bias 
 
         Y = Y.squeeze(2)
@@ -69,12 +68,11 @@ class BayesianRNN(nn.Module):
         
     def forward(self, x, sampling = False):
         batch_size, sequence_size = list(x.size())[0],list(x.size())[1]
-        output= torch.zeros(tuple([batch_size, self.output_dim]))
-        H_prev = torch.zeros(tuple([batch_size, self.hidden_dim]))
+        output= torch.zeros(tuple([batch_size, self.output_dim, 2]))
+        H_prev = torch.zeros(tuple([batch_size, self.hidden_dim, 2]))
         for t in range(sequence_size):
             x_t = x[:,t]
             x_t = x_t.unsqueeze(1)
-            
             combined = torch.cat((x_t, H_prev), 1)
            
             h_t = torch.tanh(self.i_to_h(combined, sampling))
@@ -92,7 +90,7 @@ class BayesianRNN(nn.Module):
     
     def sampling_loss(self, input, target,NUM_BATCHES, samples = SAMPLES):
         batch_size, sequence_size = list(input.size())[0],list(input.size())[1]
-        Outputs = torch.zeros(samples, batch_size, self.output_dim)
+        Outputs = torch.zeros(samples, batch_size, self.output_dim, 2)
         log_priors = torch.zeros(samples)
         log_variational_posterior = torch.zeros(samples)
         
@@ -106,10 +104,6 @@ class BayesianRNN(nn.Module):
         var = torch.ones(target.size()[0], 1, requires_grad= True)
         negative_log_likelihood = Loss(Outputs.mean(0), target)
         MSE_loss =negative_log_likelihood
-        '''
-        for i in range(samples):
-            MSE_loss.append(Loss(Outputs[i], target))   
-        ''' 
         loss = (log_variational_posterior - log_prior)/NUM_BATCHES + negative_log_likelihood
         
         return loss, MSE_loss, Outputs     
@@ -119,7 +113,8 @@ class BayesianRNN(nn.Module):
         Outputs = torch.zeros(samples, batch_size, self.output_dim)
         MSE_loss = []
         Loss = nn.MSELoss()
-        output = self(input, sampling = True)
+        for i in range(samples):
+            Outputs[i] = self(input, sampling = True)
         negative_log_likelihood = Loss(Outputs.mean(0), target)
         MSE_loss =negative_log_likelihood
         return MSE_loss
