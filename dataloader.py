@@ -28,12 +28,12 @@ def extract_data(data):
     Y = torch.tensor(np.concatenate(Y, axis=0)).type(torch.float)
     return X, Y
 
-train_data = os.path.join(os.getcwd(), 'data', 'cytrack_train.mat')
+train_data = os.path.join(os.getcwd(), 'data','south_pacific_hurricane', 'new_south_pacific_hurricane_train.mat')
 train = sio.loadmat(train_data)
 train = train['cyclones_train']
 train_final = train[0]
 
-test_data = os.path.join(os.getcwd(), 'data', 'cytrack_test.mat')
+test_data = os.path.join(os.getcwd(), 'data','south_pacific_hurricane', 'new_south_pacific_hurricane_test.mat')
 test = sio.loadmat(test_data)
 test = test['cyclones_test']
 test_final = test[0]
