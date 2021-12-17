@@ -15,7 +15,10 @@ columns = ['track_id', 'date', 'latitude', 'longitude', 'speed']
 df.columns = columns
 df =df.dropna()
 df.apply(lambda x: pd.to_numeric(x, errors = 'coerce')).dropna()
-
+df = df[df.track_id != '#VALUE!']
+df = df[df.longitude != '#VALUE!']
+df = df[df.latitude != '#VALUE!']
+df = df[df.speed != '#VALUE!']
 
 track_ids = df.track_id.unique()
 data = []
@@ -26,8 +29,6 @@ curr_list=[]
 x=[]
 count=0
 for index,row in df.iterrows():
-    if row['track_id']=='#VALUE!' or row['longitude']=='#VALUE!' or row['latitude']=='#VALUE!' or row['speed']=='#VALUE!':
-        continue
     track_id = np.double(row['track_id'])
     longitude = np.double(row['longitude'])
     latitude = np.double(row['latitude'])
@@ -47,7 +48,7 @@ for index,row in df.iterrows():
         curr_list=[]
         curr_list.append([track_id, latitude, longitude, speed])
         count+=1
-
+    
 def list_splitter(list_to_split, ratio):
     elements = len(list_to_split)
     middle = int(elements * ratio)
