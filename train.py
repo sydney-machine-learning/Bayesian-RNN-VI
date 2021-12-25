@@ -29,7 +29,7 @@ if args.model == 'BRNN':
 
         model.train()
         k=0
-        for seq,labels in trainloader:
+        for seq,labels,tracks in trainloader:
             batch_losses = []
             MSE_losses = []
             batch_losses_test = []
@@ -45,13 +45,13 @@ if args.model == 'BRNN':
             MSE_losses = torch.stack(MSE_losses)
             batch_losses = torch.stack(batch_losses)
             print(f'epoch: {i:3} loss: {batch_losses.sum()/TRAIN_SIZE:10.4f}, RMSE train: {torch.sqrt(MSE_losses.sum()/TRAIN_SIZE): .4f} ')
+    
 
-            
 
     train_mse, test_mse = [], []
     loss_fn = torch.nn.MSELoss()
     SAMPLES = args.samples
-    for seq, labels in trainloader:
+    for seq, labels,tracks in trainloader:
         out = torch.zeros(SAMPLES, len(seq), output_dim, 2)
         for i in range(SAMPLES):
             out[i] = model(seq, sampling=True)
@@ -65,21 +65,21 @@ if args.model == 'BRNN':
 
     with open(results_file_path, 'w') as f:
         writer = csv.writer(f)
-        header = ['input1_latitude', 'input1_longitude', 'input2_latitude', 'input2_longitude',
+        header = ['track_id', 'input1_latitude', 'input1_longitude', 'input2_latitude', 'input2_longitude',
                 'input3_latitude', 'input3_longitude', 'input4_latitude', 'input4_longitude',
                 'target_latitude', 'target_longitude', 'prediction_latitude', 'prediction_longitude', 
                 '5_percentile_latitude', '5_percentile_longitude', '95_percentile_latitude', '95_percentile_longitude']
         writer.writerow(header)
-        for seq, labels in testloader:
+        for seq, labels,tracks in testloader:
             out = torch.zeros(SAMPLES, len(seq), output_dim, 2)
             for i in range(SAMPLES):
                 out[i] = model(seq, sampling=True)
             p5_, p95_ =out.quantile(0.05, 0).tolist(), out.quantile(0.95, 0).tolist()
-            out = out.mean(0)
+            out = out.mean(0) 
         
 
-            for x,y,z,a,b in zip(seq, labels, out.tolist(), p5_, p95_):
-                record = [x[0].tolist()[0], x[0].tolist()[1], x[1].tolist()[0], x[1].tolist()[1], 
+            for i,x,y,z,a,b in zip(tracks,seq, labels, out.tolist(), p5_, p95_):
+                record = [i.item(), x[0].tolist()[0], x[0].tolist()[1], x[1].tolist()[0], x[1].tolist()[1], 
                         x[2].tolist()[0], x[2].tolist()[1], x[3].tolist()[0], x[3].tolist()[1], 
                         y.tolist()[0][0], y.tolist()[0][1], z[0][0], z[0][1], 
                         a[0][0], a[0][1], b[0][0], b[0][1]]
@@ -107,22 +107,25 @@ else:
     
     for i in range(1,epochs+1):
         single_loss=0
-        MSE_loss = 0
+        MSE_loss = []
 
         model.train()
-        for seq,labels in trainloader:
+        for seq,labels, tracks in trainloader:
             model.zero_grad()
             Outputs = model(seq)
             loss = Loss(Outputs, labels)
             loss.backward(retain_graph = True)
             optimizer.step()
             single_loss = loss 
-        print(f'epoch: {i:3} loss: {single_loss.item():10.8f}') 
+            MSE_loss.append(single_loss*len(seq))
+        MSE_loss = torch.stack(MSE_loss)    
+        print(f'epoch: {i:3} loss: {torch.sqrt(MSE_loss.sum()/TRAIN_SIZE):10.8f}') 
 
+    
     train_mse, test_mse = [], []
     loss_fn = torch.nn.MSELoss()
 
-    for seq, labels in trainloader:
+    for seq, labels, tracks in trainloader:
         out = model(seq)
             
         train_mse.append(torch.pow(out - labels, 2))
@@ -133,18 +136,18 @@ else:
         
     with open(results_file_path, 'w') as f:
         writer = csv.writer(f)
-        header = ['input1_latitude', 'input1_longitude', 'input2_latitude', 'input2_longitude',
+        header = ['track_id', 'input1_latitude', 'input1_longitude', 'input2_latitude', 'input2_longitude',
                 'input3_latitude', 'input3_longitude', 'input4_latitude', 'input4_longitude',
                 'target_latitude', 'target_longitude', 'prediction_latitude', 'prediction_longitude', 
                 '5_percentile_latitude', '5_percentile_longitude', '95_percentile_latitude', '95_percentile_longitude']
         writer.writerow(header)
-        for seq, labels in testloader:
+        for seq, labels, tracks in testloader:
                     
             out= model(seq)
                     
-            for x,y,z,a,b in zip(seq, labels, out.tolist(), out.tolist(), out.tolist()):
+            for i,x,y,z,a,b in zip(tracks, seq, labels, out.tolist(), out.tolist(), out.tolist()):
                         
-                record = [x[0].tolist()[0], x[0].tolist()[1], x[1].tolist()[0], x[1].tolist()[1], 
+                record = [i.item(), x[0].tolist()[0], x[0].tolist()[1], x[1].tolist()[0], x[1].tolist()[1], 
                         x[2].tolist()[0], x[2].tolist()[1], x[3].tolist()[0], x[3].tolist()[1], 
                         y.tolist()[0][0], y.tolist()[0][1], z[0][0], z[0][1], 
                         a[0][0], a[0][1], b[0][0], b[0][1]]

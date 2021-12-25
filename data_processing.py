@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def data_processing(data_tmp, window_size):
+def data_processing(data_tmp, window_size, track_id):
     table = np.asmatrix(data_tmp)
     (m, n) = np.shape(table)
     if n == 4:
@@ -23,8 +23,8 @@ def data_processing(data_tmp, window_size):
     Y = table[window_size:, [0,1]]
     Y = np.asarray(Y)
     Y = np.reshape(Y, (m - window_size, 1, 2))
-
+    tracks = np.full((m-window_size),track_id)
     for p in range(0, m - window_size):
         X[p, :, :] = mtx_3d[:, :, p]
 
-    return (X, Y)
+    return (X, Y, tracks)
