@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 import scipy.io as sio
+import random
 
 data_file_path = os.path.join(os.getcwd(),'data','north-westpacificocean', 'north-westpacificocean.csv') 
 new_mat_file_path_train = os.path.join(os.getcwd(), 'data','north-westpacificocean', 'new_north-westpacificocean_train.mat')
@@ -54,11 +55,14 @@ def list_splitter(list_to_split, ratio):
     middle = int(elements * ratio)
     return [list_to_split[:middle], list_to_split[middle:]]
 
-train, test = list_splitter(x, 0.5)              
+random.seed(1234)
+random.shuffle(x)
+
+train, test = list_splitter(x, 0.7)              
 train,test = np.array(train), np.array(test)
 print(train.shape)
 print(test.shape) 
-train,test = np.expand_dims(train, 1), np.expand_dims(test, 1)
+train, test = np.expand_dims(train, 1), np.expand_dims(test, 1)
 train, test = np.swapaxes(train, 0, 1), np.swapaxes(test, 0, 1)
 
 sio.savemat(new_mat_file_path_train, {'cyclones_train': train})
