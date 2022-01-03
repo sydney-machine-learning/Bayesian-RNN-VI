@@ -4,7 +4,7 @@ import argparse
 import matplotlib.pyplot as plt
 from pandas.io import parsers
 import os
-
+import numpy as np
 # -------------------------------------------
 
 plt.style.use('bmh')
@@ -87,7 +87,7 @@ plt.plot(prediction_longitude, prediction_latitude, label='Pred-Mean', linewidth
 plt.plot(prediction_5_perc_longitude, prediction_5_perc_latitude,  '--', color='C5', label='Pred-5%', linewidth=1, alpha=0.6)
 plt.plot(prediction_95_perc_longitude, prediction_95_perc_latitude, '--', color='C5', label='Pred-95%', linewidth=1, alpha=0.6)
 plt.plot(prediction_rnn_longitude, prediction_rnn_latitude, label='Pred_rnn-', linewidth=2, alpha=0.8)
-
+plt.fill(np.append(prediction_5_perc_longitude, prediction_95_perc_longitude[::-1]), np.append(prediction_5_perc_latitude, prediction_95_perc_latitude[::-1]), 'lightgrey')
 plt.legend(fontsize=14)
 
 plt.xticks(fontsize=16)
