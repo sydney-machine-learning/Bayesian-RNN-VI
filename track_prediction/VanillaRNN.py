@@ -29,8 +29,8 @@ class VanillaRNN(nn.Module):
         
     def forward(self, x):
         batch_size, sequence_size = list(x.size())[0],list(x.size())[1]
-        output= torch.zeros(tuple([batch_size, self.output_dim, 2]))
-        H_prev = torch.zeros(tuple([batch_size, self.hidden_dim, 2]))
+        output= nn.init.kaiming_normal_(torch.zeros(tuple([batch_size, self.output_dim, 2])))
+        H_prev = nn.init.kaiming_normal_(torch.zeros(tuple([batch_size, self.hidden_dim, 2])))
         for t in range(sequence_size):
             x_t = x[:,t]
             x_t = x_t.unsqueeze(1)

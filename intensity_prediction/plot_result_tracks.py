@@ -18,24 +18,24 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument(
     '-i_b', '--input_BRNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "north-westpacificocean_results_brnn.csv"),
+    default=os.path.join(os.getcwd(), 'results', "south_pacific_hurricane_results_blstm.csv"),
     help="Path to Input csv file"
 )
 
 parser.add_argument(
     '-i_r', '--input_RNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "train.csv"),
+    default=os.path.join(os.getcwd(), 'results', "south_pacific_hurricane_results_rnn.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-o', '--output', type=str,
-    default= os.path.join(os.getcwd(), 'plots', 'south_indian_hurricane_track_6.jpg'),
+    default= os.path.join(os.getcwd(), 'plots', 'south_pacific_hurricane_track_6_blstm.jpg'),
     help="Path to plot file"
 )
 
 parser.add_argument(
-    '--track_id', type=int, default=12,
+    '--track_id', type=int, default=6,
     help="Track id of the cyclone"
 )
 
@@ -49,8 +49,7 @@ args = parser.parse_args()
 df = pd.read_csv(args.input_BRNN, index_col=False)
 df_filter = df.loc[df.track_id==args.track_id]
 
-rnn_df = pd.read_csv(args.input_RNN, index_col=False)
-rnn_df_filter = rnn_df.loc[rnn_df.track_id==args.track_id]
+
 
 
 
@@ -74,24 +73,21 @@ prediction_95_perc_speed = df_filter['95_percentile_speed'].values
 prediction_95_perc_speed = prediction_95_perc_speed.astype(np.float)
 prediction_95_perc_speed = np.round(prediction_95_perc_speed, decimals=2)
 
-#Predictions - RNN
-prediction_rnn_speed = rnn_df_filter.prediction_speed.values
-prediction_rnn_speed = prediction_rnn_speed.astype(np.float)
-prediction_rnn_speed = np.round(prediction_rnn_speed, decimals=2)
 # -------------------------------------------
 # PLOT
 # -------------------------------------------
 
 
 x = list(range(df_filter.shape[0]))
-
+x_ = list(range(df_filter.shape[0]*2))
 #fig = plt.figure(figsize=(14, 10))
 plt.plot(x, target_speed, label='Target', linewidth=2, alpha=0.8)
 plt.plot(x, prediction_speed, label='Pred-Mean', linewidth=2, alpha=0.8)
 plt.plot(x, prediction_5_perc_speed,  '--', color='C5', label='Pred-5%', linewidth=1, alpha=0.6)
 plt.plot(x, prediction_95_perc_speed, '--', color='C5', label='Pred-95%', linewidth=1, alpha=0.6)
-#plt.plot(x, prediction_rnn_speed, label='Pred_rnn-', linewidth=2, alpha=0.8)
-#plt.fill_between(x, prediction_5_perc_speed, prediction_95_perc_speed, 'lightgrey')
+
+
+plt.fill(np.append(np.array(x), np.array(x)[::-1]), np.append(prediction_5_perc_speed, prediction_95_perc_speed[::-1]), 'lightgrey')
 plt.legend(fontsize=14)
 
 plt.xticks(fontsize=16)

@@ -5,9 +5,9 @@ import numpy as np
 import scipy.io as sio
 import random
 
-data_file_path = os.path.join(os.getcwd(),'data','north-westpacificocean', 'north-westpacificocean.csv') 
-new_mat_file_path_train = os.path.join(os.getcwd(), 'data','north-westpacificocean', 'new_north-westpacificocean_train.mat')
-new_mat_file_path_test = os.path.join(os.getcwd(), 'data','north-westpacificocean', 'new_north-westpacificocean_test.mat')
+data_file_path = os.path.join(os.getcwd(),'data','south_pacific_hurricane', 'south_pacific_hurricane.csv') 
+new_mat_file_path_train = os.path.join(os.getcwd(), 'data','south_pacific_hurricane', 'new_south_pacific_hurricane_train.mat')
+new_mat_file_path_test = os.path.join(os.getcwd(), 'data','south_pacific_hurricane', 'new_south_pacific_hurricane_test.mat')
                     
 
                          

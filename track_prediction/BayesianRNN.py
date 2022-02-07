@@ -108,16 +108,14 @@ class BayesianRNN(nn.Module):
         
         return loss, MSE_loss, Outputs     
     
-    def testing(self, input, target, num_batches, samples = SAMPLES):
+    def testing(self, input, samples = SAMPLES):
         batch_size, sequence_size = list(input.size())[0],list(input.size())[1]
-        Outputs = torch.zeros(samples, batch_size, self.output_dim)
+        Outputs = torch.zeros(samples, batch_size, self.output_dim, 2)
         MSE_loss = []
         Loss = nn.MSELoss()
         for i in range(samples):
             Outputs[i] = self(input, sampling = True)
-        negative_log_likelihood = Loss(Outputs.mean(0), target)
-        MSE_loss =negative_log_likelihood
-        return MSE_loss
+        return Outputs
         
         
         

@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import numpy as np
 import scipy.io as sio
+import random 
 
 data_file_path = os.path.join(os.getcwd(),'data','south_pacific_hurricane', 'south_pacific_hurricane.csv') 
 new_mat_file_path_train = os.path.join(os.getcwd(), 'data','south_pacific_hurricane', 'new_south_pacific_hurricane_train.mat')
@@ -53,6 +54,9 @@ def list_splitter(list_to_split, ratio):
     elements = len(list_to_split)
     middle = int(elements * ratio)
     return [list_to_split[:middle], list_to_split[middle:]]
+
+random.seed(1234)
+random.shuffle(x)
 
 train, test = list_splitter(x, 0.7)              
 train,test = np.array(train), np.array(test)
