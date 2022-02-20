@@ -18,31 +18,31 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument(
     '-i_b', '--input_BRNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_brnn.csv"),
+    default=os.path.join(os.getcwd(), 'results', "south_pacific_hurricane_results_brnn.csv"),
     help="Path to Input csv file"
 )
 
 parser.add_argument(
     '-i_r', '--input_RNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_rnn.csv"),
+    default=os.path.join(os.getcwd(), 'results', "south_pacific_hurricane_results_rnn.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-i_bl', '--input_BLSTM', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_blstm.csv"),
+    default=os.path.join(os.getcwd(), 'results', "south_pacific_hurricane_results_blstm.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-i_l', '--input_LSTM', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_lstm.csv"),
+    default=os.path.join(os.getcwd(), 'results', "south_pacific_hurricane_results_lstm.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-o', '--output', type=str,
-    default= os.path.join(os.getcwd(), 'plots', 'northindianocean_'),
+    default= os.path.join(os.getcwd(), 'plots', 'south_pacific_hurricane_'),
     help="Path to plot file"
 )
 
@@ -101,15 +101,15 @@ plt.plot(prediction_5_perc_longitude, prediction_5_perc_latitude,  '--', color='
 plt.plot(prediction_95_perc_longitude, prediction_95_perc_latitude, '--', color='C5', label='Pred-95%', linewidth=1, alpha=0.6)
 
 plt.fill(np.append(prediction_5_perc_longitude, prediction_95_perc_longitude[::-1]), np.append(prediction_5_perc_latitude, prediction_95_perc_latitude[::-1]), 'lightgrey')
-plt.legend(fontsize=14)
+plt.legend(fontsize=22)
 
-plt.xticks(fontsize=16)
-plt.yticks(fontsize=16)
+plt.xticks(fontsize=24)
+plt.yticks(fontsize=24)
 
 
-plt.xlabel('Longitude', fontsize=16)
-plt.ylabel('Latitude', fontsize=16)
-plt.title
+plt.xlabel('Longitude', fontsize=24)
+plt.ylabel('Latitude', fontsize=24)
+plt.title('Track prediction - south pacific ocean BLSTM', fontsize=24)
 plt.savefig(save_file, dpi=300)
 
 # -------------------------------------------
