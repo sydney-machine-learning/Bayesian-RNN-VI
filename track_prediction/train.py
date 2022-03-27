@@ -22,7 +22,7 @@ epochs = args.epochs
 results_file_path = os.path.join(os.getcwd(), 'results', args.result_file + '.csv')
 r_file = os.path.join(os.getcwd(), 'results', 'test_vals.csv')
 if args.model == 'BRNN':
-    model = BayesianRNN(input_dim, hidden_dim, output_dim)
+    model = BayesianLSTM(input_dim, hidden_dim, output_dim)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
     for i in range(1,epochs+1):
@@ -52,7 +52,10 @@ if args.model == 'BRNN':
         single_loss_test = 0
         MSE_loss_test = 0
         
-        SAMPLES = args.samples
+    
+
+        
+    SAMPLES = args.samples
     
 
     
@@ -76,6 +79,68 @@ if args.model == 'BRNN':
 
     train_rmse = torch.sqrt(nn.functional.mse_loss(out_list,labels_list))
     train_rmse_std = torch.std(train_rmse_losses)
+
+
+    with open(results_file_path, 'w') as f:
+        writer = csv.writer(f)
+        header = ['track_id', 'input1_latitude', 'input1_longitude', 'input2_latitude', 'input2_longitude',
+                'input3_latitude', 'input3_longitude', 'input4_latitude', 'input4_longitude',
+                'target_latitude', 'target_longitude', 'prediction_latitude', 'prediction_longitude']
+        writer.writerow(header)
+
+        labels_list,out_list=[],[]
+        all_tracks,sequences= [],[]
+        for seq, labels, tracks in testloader:
+            out_ = model.testing(seq)
+            labels_list.append(labels)
+            sequences.append(seq)
+            all_tracks.append(tracks)
+            out_list.append(torch.swapaxes(out_,0,1))
+        
+        labels_list=torch.cat(labels_list, dim=0)
+        sequences=torch.cat(sequences, dim=0)
+        all_tracks=torch.cat(all_tracks, dim=0)
+        out_list=torch.cat(out_list, dim=0)
+        out_list = torch.swapaxes(out_list,0,1) 
+        # print(out_list.size())
+        output = out_list
+        test_rmse_losses=[] 
+        for i in range(SAMPLES):
+            test_rmse_losses.append(torch.sqrt(nn.functional.mse_loss(out_list[i], labels_list)))
+        
+        test_rmse_losses = torch.FloatTensor(test_rmse_losses)
+        out_list = out_list.quantile(0.5, 0)
+
+        test_rmse = torch.sqrt(nn.functional.mse_loss(out_list,labels_list))
+        all_tracks = all_tracks.tolist()
+        sequences = sequences.tolist()
+        test_rmse = torch.sqrt(nn.functional.mse_loss(out_list,labels_list))
+        labels_list = labels_list.tolist()
+        # p5_, p95_,out = output.quantile(0.05, 0).tolist(), output.quantile(0.95, 0).tolist(), output.quantile(0.5, 0).tolist()
+
+        out = output.permute(1, 2, 3, 0).tolist()
+        
+
+        for i,x,y,z in zip(all_tracks,sequences, labels_list, out):
+                record = [i, x[0][0], x[0][1], x[1][0], x[1][1], 
+                        x[2][0], x[2][1], x[3][0], x[3][1], 
+                        y[0][0], y[0][1], z[0][0], z[0][1]]
+                writer.writerow(record)
+        
+
+
+    
+    test_rmse_std = torch.std(test_rmse_losses)
+
+
+
+    print('---------------------------')
+    print('---------------------------')
+    print(f'train RMSE ----> {train_rmse}')
+    print(f'Test RMSE ----> {test_rmse}')
+    print(f'train RMSE std ----> {train_rmse_std}')
+    print(f'Test RMSE std----> {test_rmse_std}')  
+
 
     '''
     with open(results_file_path, 'w') as f:
@@ -124,7 +189,7 @@ if args.model == 'BRNN':
                         y[0][0], y[0][1], z[0][0], z[0][1], 
                         a[0][0], a[0][1], b[0][0], b[0][1]]
                 writer.writerow(record)
-    '''      
+       
 #----------------------------------
     header = ['track_id', 'target_latitude', 'target_longitude', 'prediction_latitude', 'prediction_longitude']
     for i in range(SAMPLES):
@@ -186,7 +251,7 @@ if args.model == 'BRNN':
     print(f'train RMSE std ----> {train_rmse_std}')
     print(f'Test RMSE std----> {test_rmse_std}')  
         
-    
+    '''
 
 
     

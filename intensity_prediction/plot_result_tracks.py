@@ -18,24 +18,24 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument(
     '-i_b', '--input_BRNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "south_indian_hurricane_results_blstm.csv"),
+    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_blstm.csv"),
     help="Path to Input csv file"
 )
 
 parser.add_argument(
     '-i_r', '--input_RNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "south_indian_hurricane_results_rnn.csv"),
+    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_rnn.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-o', '--output', type=str,
-    default= os.path.join(os.getcwd(), 'plots', 'south_indian_hurricane_track_2_blstm.jpg'),
+    default= os.path.join(os.getcwd(), 'plots', 'northindianocean_track_3_blstm.jpg'),
     help="Path to plot file"
 )
 
 parser.add_argument(
-    '--track_id', type=int, default=2,
+    '--track_id', type=int, default=3,
     help="Track id of the cyclone"
 )
 
@@ -97,8 +97,8 @@ plt.yticks(fontsize=16)
 plt.xlabel('observation no.', fontsize=16)
 plt.ylabel('speed', fontsize=16)
 
-plt.savefig(args.output, dpi=300)
-
+#plt.savefig(args.output, dpi=300)
+plt.show()
 # -------------------------------------------
 
 

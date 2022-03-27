@@ -54,37 +54,29 @@ def get_number_of_cyclones(cyclone_name):
 plt.rc('font', size = 20)
 
 lengths = []
-northindianocean = get_number_of_cyclones('northindianocean')
-lengths.extend(northindianocean)
-northindianocean_length = len(northindianocean)
-print(f'north indian ocean ===> {northindianocean_length}')
+south_pacific_hurricane = get_number_of_cyclones('south_pacific_hurricane')
+lengths.extend(south_pacific_hurricane)
+south_pacific_hurricane_length = len(south_pacific_hurricane)
+print(f'north indian ocean ===> {south_pacific_hurricane_length}')
 
-northwestpacificocean = get_number_of_cyclones('north-westpacificocean')
-lengths.extend(northwestpacificocean)
-northwestpacificocean_length = len(northwestpacificocean)
-print(f'north west pacific ocean ===> {northwestpacificocean_length}')
-
-southindianhurricane = get_number_of_cyclones('south_indian_hurricane')
-lengths.extend(southindianhurricane)
-southindianhurricane_length = len(southindianhurricane)
-print(f'south indian hurricane ===> {southindianhurricane_length}')
-
-southpacifichurricane = get_number_of_cyclones('south_pacific_hurricane')
-lengths.extend(southpacifichurricane)
-southpacifichurricane_length = len(southpacifichurricane)
-print(f'south pacific hurricane ===> {southpacifichurricane_length}')
+p = lambda x: [element*2 for element in x]
+lengths = p(lengths)
 
 
 lengths = np.array(lengths)
 fig, ax = plt.subplots(figsize =(10, 7))
-xticks = [0,10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-ax.hist(lengths, bins = [0,10, 20, 30, 40, 50, 60, 70, 80, 90, 100], color = 'lightsteelblue')
+xticks = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+bins = [0,10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+xticks = p(xticks)
+bins = p(bins)
+ax.hist(lengths, bins = bins, color = 'lightsteelblue')
 ax.set_xticks(xticks)
-plt.xlabel("Cyclone Length")
+plt.xlabel("Cyclone Duration (in hours)")
 plt.ylabel('Frequency')
-plt.title('Histogram of Cyclone lengths')
 
-fig.set_size_inches(18.5, 10.5, forward=True)
+
+#fig.set_size_inches(18.5, 10.5, forward=True)
 fig.set_dpi(100)
-savefile = os.path.join(os.getcwd(), 'plots', 'cyclone_lengths_histogram'+ '.jpg')
+savefile = os.path.join(os.getcwd(), 'plots', 'cyclone_lengths_histogram_south_pacific_hurricane'+ '.jpg')
 plt.savefig(savefile)
+#plt.show()

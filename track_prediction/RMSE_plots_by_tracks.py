@@ -35,31 +35,31 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument(
     '-i_b', '--input_BRNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_brnn.csv"),
+    default=os.path.join(os.getcwd(), 'percentileresults', "south_pacific_hurricane_results_brnn.csv"),
     help="Path to Input csv file"
 )
 
 parser.add_argument(
     '-i_r', '--input_RNN', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_rnn.csv"),
+    default=os.path.join(os.getcwd(), 'percentileresults', "south_pacific_hurricane_results_rnn.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-i_bl', '--input_BLSTM', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_blstm.csv"),
+    default=os.path.join(os.getcwd(), 'percentileresults', "south_pacific_hurricane_results_blstm.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-i_l', '--input_LSTM', type=str, 
-    default=os.path.join(os.getcwd(), 'results', "northindianocean_results_lstm.csv"),
+    default=os.path.join(os.getcwd(), 'percentileresults', "south_pacific_hurricane_results_lstm.csv"),
     help="Path to Input csv file" 
 )
 
 parser.add_argument(
     '-o', '--output', type=str,
-    default= os.path.join(os.getcwd(), 'plots', 'northindianocean_'),
+    default= os.path.join(os.getcwd(), 'plots', 'south_pacific_hurricane_'),
     help="Path to plot file"
 )
 
